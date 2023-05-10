@@ -1,0 +1,3 @@
+#!/usr/bin/env xal
+# Generate a list of files with their identified encoding and MIME type.
+fs_select "$@"

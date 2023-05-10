@@ -1,0 +1,7 @@
+#!/usr/bin/env xal
+# Process the selected files and sort the consolidated product in preparation for reduction.
+# `fs-select directory-of-json-and-html-files | funnel | clean` is the usual spelling.
+#
+# [ Effects ]
+# Reads resource references from standard input and writes sorted link quads to standard output.
+xalexec xal.matrix.switch | sort -k1 -t"$FS"
