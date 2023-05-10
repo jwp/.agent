@@ -1,0 +1,47 @@
+#!/bin/sh
+# - Install Python dependencies to `xal/.pypi`, lz4 and pygtrie.
+# - Bind if/context.sh to an executable script for performing project operations(if/*).
+# - Display basic usage and installation.
+cd "$(dirname "$0")" || exit
+export XAL_CONTEXT="$(pwd)"
+. ./if/context.sh || exit # test -x xal/setup.
+
+if python3 -m pip install --upgrade -t "$XAL_CONTEXT/.pypi" lz4 pygtrie
+then
+	# Check installation.
+
+	xalfix >&2 .string 'import lz4.version as v; print("lz4:", v.version)'
+	if test $? -ne 0
+	then
+		echo >&2 "WARNING: LZ4 is required for mozilla's lz4json files."
+	fi
+
+	xalfix >&2 .string 'import pygtrie; print("pygtrie:", pygtrie.__version__)'
+	if test $? -ne 0
+	then
+		echo >&2 "WARNING: pygtrie is required for prefix filtering."
+	fi
+fi
+
+# Unconditionally install as .bin/xal; allow user to make links as desired.
+TARGET="$XAL_CONTEXT/.bin/xal"
+mkdir -p "$XAL_CONTEXT/.bin"
+touch "$TARGET" && chmod a+x "$TARGET"
+cat >"$TARGET" <<EOF
+#!/bin/sh
+SCRIPT="\$0"
+export XAL_CONTEXT='${XAL_CONTEXT}'
+. "\$XAL_CONTEXT/if/context.sh"
+xalcmd "\$@"
+EOF
+
+# Note usage and installation.
+(
+	echo
+	echo "Direct Usage[execution without PATH modifications]:"
+	echo "  env '-P$(dirname "$TARGET")' xal command ..."
+	echo "Install[or any directory in PATH]:"
+	echo "  ln -sfh '$TARGET' ~/.bin/"
+	echo
+	echo ">>> xal help"
+) >&2 && "$TARGET" help
