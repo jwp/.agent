@@ -1,0 +1,4 @@
+#!/usr/bin/env xal
+LINKCONTEXT="$1"
+shift 1
+xalfix xal.visitation.switch "$LINKCONTEXT" | Sort | xalfix xal.visitation.aggregate
