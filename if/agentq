@@ -1,0 +1,6 @@
+#!/usr/bin/env xal
+# Query for agent executables and user data.
+#
+# [ Effects ]
+# Writes profile or executable locations to standard output.
+xalexec xal.agent.query "$@"
