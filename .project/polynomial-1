@@ -1,8 +1,12 @@
 http://if.fault.io/factors/meta
 	chapter.txt fault-1 kleptic
-	references.fr text lines
+	references.fr lines text
+http://if.fault.io/factors/shell
+	script.sh bourne
+	include.sh bourne
+	context.sh bourne
 http://if.fault.io/factors/system
-	references.sr text lines
+	references.sr lines text
 	elements.c 2011 c
 	void.h header c
 http://if.fault.io/factors/python
