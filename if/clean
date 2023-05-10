@@ -1,0 +1,6 @@
+#!/usr/bin/env xal
+# Reduce and clean the sorted link data read from standard input using &.matrix.sweep.
+#
+# [ Effects ]
+# Reads link data from standard input and writes filtered records to standard output.
+xalexec xal.matrix.sweep "$@"
