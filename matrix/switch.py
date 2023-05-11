@@ -76,7 +76,7 @@ def htmlcase(r:Resource):
 	with r.r_selector.fs_open('rb') as f:
 		p = subprocess.run([htmlexe], stdin=f, check=True)
 
-def textcase(r:Resource, *, max_record_size=1024*20):
+def textcase(r:Resource, *, max_record_size=1024*200):
 	"""
 	# Prefer JSON, but check for TSV as well.
 	"""
@@ -106,7 +106,9 @@ def textcase(r:Resource, *, max_record_size=1024*20):
 					if tc == 3:
 						# Four fields, maybe TSV.
 						scase = reflectcase
-					elif sample.startswith(b'http') or sample.startswith(b'ftp'):
+					elif sample.startswith(b'data:') or \
+					sample.startswith(b'http') or \
+					sample.startswith(b'ftp'):
 						# Probably not JSON; presume TSV.
 						scase = reflectcase
 					else:
