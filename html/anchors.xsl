@@ -12,12 +12,23 @@
 	xmlns:func="http://exslt.org/functions"
 	xmlns:xlink="https://www.w3.org/1999/xlink"
 	xmlns:l="#local"
+	xmlns="http://www.w3.org/1999/xhtml"
 	extension-element-prefixes="exsl dyn func">
 
 	<xsl:output method="text" encoding="utf-8" indent="no"/>
 	<xsl:strip-space elements="*"/>
+
+	<!-- RI Prefix -->
+	<xsl:param name="SITE" select="'http://[]'"/>
+
+	<!-- Format control. -->
 	<xsl:param name="FS" select="'&#09;'"/>
 	<xsl:param name="RS" select="'&#10;'"/>
+
+	<xsl:variable name="EFS" select="str:encode-uri($FS, '')"/>
+	<xsl:variable name="ERS" select="str:encode-uri($RS, '')"/>
+
+	<!-- Tag constraints -->
 	<xsl:param name="CONTEXT" select="'.'"/>
 	<xsl:param name="TYPES" select="'//a|//*[@xlink:href]'"/>
 	<xsl:param name="PREDICATE" select="'[node()]'"/>
@@ -25,13 +36,53 @@
 
 	<xsl:variable name="SV" select="concat($FS, $RS)"/>
 
-	<func:function name="l:uri-guard">
+	<!-- Qualify relative links with SITE context. -->
+	<func:function name="l:uri-qualify">
 		<xsl:param name="string"/>
-		<xsl:variable name="fields" select="str:replace($string, $FS, '%09')"/>
-		<xsl:variable name="records" select="str:replace($fields, $RS, '%0A')"/>
+		<func:result>
+			<xsl:choose>
+				<xsl:when test="starts-with($string, '/')">
+					<xsl:value-of select="concat($SITE, $string)"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="$string"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</func:result>
+	</func:function>
+
+	<!-- Protect field separators. -->
+	<func:function name="l:uri-guard">
+		<!--
+			# Limited to FS and RS as this intends to *only* guard the separators.
+			# If further normalization is desired, it should be done so downstream.
+		!-->
+		<xsl:param name="string"/>
+		<xsl:variable name="fields" select="str:replace($string, $FS, $EFS)"/>
+		<xsl:variable name="records" select="str:replace($fields, $RS, $ERS)"/>
 
 		<func:result>
-			<xsl:value-of select="$records"/>
+			<xsl:value-of select="l:uri-qualify($records)"/>
+		</func:result>
+	</func:function>
+
+	<func:function name="l:sequence">
+		<xsl:param name="site"/>
+		<xsl:param name="link"/>
+		<xsl:param name="time-context"/>
+		<xsl:param name="icon"/>
+		<xsl:param name="title"/>
+
+		<!-- Blank the separators for the non-URI fields. -->
+		<func:result>
+			<xsl:value-of select="l:uri-guard($link)"/>
+			<xsl:value-of select="$FS"/>
+			<xsl:value-of select="translate($time-context, $SV, '  ')"/>
+			<xsl:value-of select="$FS"/>
+			<xsl:value-of select="l:uri-guard($icon)"/>
+			<xsl:value-of select="$FS"/>
+			<xsl:value-of select="translate($title, $SV, '  ')"/>
+			<xsl:value-of select="$RS"/>
 		</func:result>
 	</func:function>
 
@@ -42,14 +93,7 @@
 		<xsl:variable name="n" select="./text()"/>
 
 		<!-- Blank the separators for the non-URI fields. -->
-		<xsl:value-of select="l:uri-guard($r)"/>
-		<xsl:value-of select="$FS"/>
-		<xsl:value-of select="translate($t, $SV, '  ')"/>
-		<xsl:value-of select="$FS"/>
-		<xsl:value-of select="l:uri-guard($i)"/>
-		<xsl:value-of select="$FS"/>
-		<xsl:value-of select="translate($n, $SV, '  ')"/>
-		<xsl:value-of select="$RS"/>
+		<xsl:value-of select="l:sequence($SITE, $r, $t, $i, $n)"/>
 	</xsl:template>
 
 	<xsl:template match="/*">
