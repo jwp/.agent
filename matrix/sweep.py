@@ -8,7 +8,6 @@
 # /time-context/
 	# - Convert into `ISO-8601` strings.
 	# - Adjust precision when the point falls outside of limits.
-	# - Truncate to the minute and add an integer hash of the link, &uhash.
 # /icon/
 	# - Transparent
 # /titles/
@@ -18,7 +17,6 @@
 """
 import sys
 import functools
-import hashlib
 from collections.abc import Iterable
 from typing import TypeAlias, Callable
 
@@ -129,7 +127,7 @@ def relink(link):
 	scheme = normal.get(scheme, scheme)
 	nlink = scheme + l[eos:end]
 
-	return nlink
+	return trailing(nlink)
 
 # 1900 < ts < +100y
 time_limits = (
@@ -169,7 +167,7 @@ def restamp(ts:str, *, current=utc().truncate('minute'), limits=time_limits):
 		while tc > limits[1]:
 			tc = tc.__class__(tc // 1000)
 
-	return tc.truncate('minute')
+	return tc
 del time_limits
 
 def retitle(title:str):
@@ -210,23 +208,26 @@ def structure(line, *, fields=4, FS='\t', RS='\n', tuple=tuple):
 	assert line[-1] == RS
 	return tuple(line[:-1].split(FS, fields-1))
 
-def uhash(link):
+def trailing(link):
 	"""
-	# Construct a time delta from the hash of the link.
+	# Normalize host references to include trailing slash.
 	"""
-	h = hashlib.sha512(usedforsecurity=False)
-	assert h.digest_size == 64
+	if link.endswith('/') or link.startswith('/'):
+		# Fast path.
+		return link
 
-	h.update(link.encode('utf-8'))
-	hd = h.digest()
+	h = link.find('://')
+	if h == -1:
+		# Not an iauthority IRI.
+		return link
 
-	ns = 0
-	for i in range(0, 64, 8):
-		ns ^= int.from_bytes(hd[i:i+8])
-
-	m = Measure.of(nanosecond=ns)
-	delta = m.truncate('minute')
-	return m.decrease(delta)
+	# Presumes escaped slashes.
+	first = link.find('/', h + 3)
+	if first == -1:
+		# Normalize site reference.
+		return link + '/'
+	else:
+		return link
 
 def normalize(records, *, titlefilter=str):
 	joined = None
@@ -262,7 +263,7 @@ def normalize(records, *, titlefilter=str):
 			tr = ''
 
 		# Truncate to minute and hide a xor-folded sha512.
-		ts = restamp(time).elapse(uhash(clean))
+		ts = restamp(time)
 
 		yield (clean, ts, icon, tr)
 
