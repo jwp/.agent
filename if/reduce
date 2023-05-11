@@ -3,4 +3,4 @@
 #
 # [ Effects ]
 # Reads sorted records from standard input and writes merged records to standard output.
-xalexec xal.matrix.reduce
+xalexec xal.matrix.aggregate
