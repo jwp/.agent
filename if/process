@@ -2,4 +2,6 @@
 # Perform the complete pipeline joining data partitions into a single, sorted, data set.
 PARTITIONS="$1"
 shift 1
-fs_select "$PARTITIONS" | xal funnel | xal clean -X"$@" -E
+fs_select "$PARTITIONS" | \
+	xal funnel | xal clean -X"$@" -E | \
+	sort | xal reduce

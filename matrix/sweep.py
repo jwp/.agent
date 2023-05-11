@@ -111,9 +111,10 @@ def relink(link):
 	"""
 	l = link.strip()
 
+	# Get scheme for mapping to a normal form.
 	eos = l.find(':', 0, 48)
 	if eos == -1:
-		# Probably not an RI.
+		# Probably not an scheme qualified RI.
 		return ''
 	else:
 		scheme = l[:eos].lower()
@@ -216,7 +217,7 @@ def uhash(link):
 	h = hashlib.sha512(usedforsecurity=False)
 	assert h.digest_size == 64
 
-	h.update(link.lower().encode('utf-8'))
+	h.update(link.encode('utf-8'))
 	hd = h.digest()
 
 	ns = 0
@@ -255,16 +256,15 @@ def normalize(records, *, titlefilter=str):
 
 		# Normalize title spaces and check for link equivalence.
 		tr = retitle(titlefilter(title))
-		if relink(tr).lower() == link.lower():
+		if relink(tr).lower() == clean.lower():
 			# A distance measure would be a better comparison, but
 			# this should catch most of the repetition.
 			tr = ''
 
 		# Truncate to minute and hide a xor-folded sha512.
-		ts = restamp(time).elapse(uhash(link))
+		ts = restamp(time).elapse(uhash(clean))
 
-		last = (clean, ts, icon, tr)
-		yield last
+		yield (clean, ts, icon, tr)
 
 def rewrite(find, records):
 	"""
@@ -312,57 +312,6 @@ def rewriting(rwt:Iterable[tuple[str,str]]):
 
 def ignoring(values, records):
 	return (x for x in records if x[0] not in values)
-
-def merge(former, latter):
-	"""
-	# Merge the fields of identical links recognizing earlier time contexts
-	# and non-empty fields as preferable.
-	"""
-	l, t, i, T = former
-	assert l == latter[0]
-	nd = 0
-
-	if latter[1] < t:
-		# Earliest timestamp wins.
-		t = latter[1]
-		nd += 1
-
-	if latter[-1] and not T:
-		# First non-empty title wins.
-		T = latter[-1]
-		nd += 1
-	if not i and latter[2]:
-		# First non-empty icon wins.
-		i = latter[2]
-		nd += 1
-
-	if nd:
-		return (l, t, i, T)
-	else:
-		# Avoid reconstruction when fields have not been changed.
-		return former
-
-def reduce(records, never=utc().elapse(year=100)):
-	"""
-	# Merge duplicate link records; presumes &records is sorted.
-	"""
-
-	# Initial state that will be immediately overwritten by &merge.
-	i = iter(records)
-	try:
-		y = next(i)
-	except StopIteration:
-		return
-
-	for r in i:
-		if r[0] == y[0]:
-			y = merge(y, r)
-		else:
-			yield y
-			y = r
-	else:
-		# Last one.
-		yield y
 
 def interpret_filters(files):
 	"""
@@ -450,5 +399,5 @@ def main(inv:process.Invocation) -> process.Exit:
 	if config['function-true-filters']:
 		series = python_filters(filter, config['function-true-filters'], series)
 
-	sys.stdout.writelines(map(sequence, reduce(series)))
+	sys.stdout.writelines(map(sequence, series))
 	return inv.exit(0)

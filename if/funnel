@@ -4,4 +4,4 @@
 #
 # [ Effects ]
 # Reads resource references from standard input and writes sorted link quads to standard output.
-xalexec xal.matrix.switch | sort -k1 -t"$FS"
+xalexec xal.matrix.switch "$@"

@@ -1,0 +1,6 @@
+#!/usr/bin/env xal
+# Reduce duplicate link records by combining the fields where appropriate.
+#
+# [ Effects ]
+# Reads sorted records from standard input and writes merged records to standard output.
+xalexec xal.matrix.reduce
