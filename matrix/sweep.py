@@ -133,7 +133,7 @@ def relink(link):
 # 1900 < ts < +100y
 time_limits = (
 	Timestamp.of(year=1900),
-	utc().elapse(year=100).truncate('year'),
+	utc().elapse(year=1).truncate('year'),
 )
 
 def restamp(ts:str, *, current=utc().truncate('minute'), limits=time_limits):
@@ -157,7 +157,7 @@ def restamp(ts:str, *, current=utc().truncate('minute'), limits=time_limits):
 		t = Timestamp.of(iso=ts)
 
 	# Reduce precision and handle precision failures.
-	tc = t.truncate('minute')
+	tc = t
 
 	# Presume unrecognized or unknown precision when outside of &limits.
 	if tc < limits[0]:
@@ -168,7 +168,7 @@ def restamp(ts:str, *, current=utc().truncate('minute'), limits=time_limits):
 		while tc > limits[1]:
 			tc = tc.__class__(tc // 1000)
 
-	return tc
+	return tc.truncate('minute')
 del time_limits
 
 def retitle(title:str):
