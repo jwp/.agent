@@ -33,5 +33,5 @@ Released under CC-0 or Public Domain.
 xal process path/to/export/collection/ filters-file >links.tsv
 
 # Copies sqlite database into temporary directory before joining with `links.tsv`.
-xal track -Amozilla-firefox -Agoogle-chrome links.tsv >visits.tsv
+xal agentq visitation | xal track -Amozilla-firefox -Agoogle-chrome links.tsv >visits.tsv
 ```
