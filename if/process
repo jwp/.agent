@@ -2,6 +2,22 @@
 # Perform the complete pipeline joining data partitions into a single, sorted, data set.
 PARTITIONS="$1"
 shift 1
+
+prefix ()
+{
+	y="$1"
+	shift 1
+
+	for x in "$@"
+	do
+		echo "$y$x"
+	done
+}
+IFS='
+'
+set -- $(prefix -X "$@")
+unset IFS
+
 fs_select "$PARTITIONS" | \
-	xal funnel | xal clean -X"$@" -E | \
+	xal funnel | xal clean -E "$@" | \
 	sort | xal reduce
