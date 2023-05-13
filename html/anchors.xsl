@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
 	# Extract links from HTML and Netscape bookmark files.
-	# Use in conjunction with &force-xml. Exposes some XPath via parameters and emits
-	# TSV output.
+	# Use in conjunction with &force-xml.
+	# Exposes some XPath via parameters and emits TSV output.
 !-->
 <xsl:transform version="1.0"
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -20,6 +20,7 @@
 
 	<!-- RI Prefix -->
 	<xsl:param name="SITE" select="'http://[]'"/>
+	<xsl:param name="PATH" select="'/'"/>
 
 	<!-- Format control. -->
 	<xsl:param name="FS" select="'&#09;'"/>
@@ -39,13 +40,27 @@
 	<!-- Qualify relative links with SITE context. -->
 	<func:function name="l:uri-qualify">
 		<xsl:param name="string"/>
+		<xsl:param name="site" select="$SITE"/>
+		<xsl:param name="path" select="$PATH"/>
+
 		<func:result>
 			<xsl:choose>
-				<xsl:when test="starts-with($string, '/')">
-					<xsl:value-of select="concat($SITE, $string)"/>
-				</xsl:when>
-				<xsl:otherwise>
+				<!-- Empty URI case. -->
+				<xsl:when test="$string=''"></xsl:when>
+
+				<!-- iauthority case. -->
+				<xsl:when test="starts-with($string, 'data:') or starts-with($string, 'mailto:') or substring-before($string, '://') != ''">
 					<xsl:value-of select="$string"/>
+				</xsl:when>
+
+				<!-- Site absolute -->
+				<xsl:when test="starts-with($string, '/')">
+					<xsl:value-of select="concat($site, $string)"/>
+				</xsl:when>
+
+				<!-- Resource relative -->
+				<xsl:otherwise>
+					<xsl:value-of select="concat($site, '/', $path, $string)"/>
 				</xsl:otherwise>
 			</xsl:choose>
 		</func:result>
@@ -88,7 +103,7 @@
 
 	<xsl:template match="a|*[@xlink:href]">
 		<xsl:variable name="r" select="(@HREF|@href|@xlink:href)[position()=1]"/>
-		<xsl:variable name="t" select="(@ADDED_DATE|@added_date|@ADD_DATE|@add_date)[position()=1]"/>
+		<xsl:variable name="t" select="(@date|@ADDED_DATE|@added_date|@ADD_DATE|@add_date)[position()=1]"/>
 		<xsl:variable name="i" select="(@ICON|@icon|@IMAGE|@image)[position()=1]"/>
 		<xsl:variable name="n" select="./text()"/>
 

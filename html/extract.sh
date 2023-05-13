@@ -21,11 +21,12 @@ then
 fi
 
 # tidy | anchors.xsl; slightly tricky to get this to work with bookmark files.
-"${HTMLTIDY:-tidy}" \
-	-config "$HTMLTIDYCONFIG" /dev/stdin | \
+# "${HXNORMALIZE:-hxnormalize} -xe | \
+"${HTMLTIDY:-tidy}" config "$HTMLTIDYCONFIG" /dev/stdin 2>/dev/null | \
 "${XSLTPROC:-xsltproc}" 2>/dev/null \
 	--html --nonet --novalid --nowrite --nodtdattr \
 	--stringparam SITE "${SITE:-http://[]}" \
+	--stringparam PATH "${SITEPATH:-./}" \
 	--stringparam FS "$FS" --stringparam RS "$RS" \
 	--stringparam CONTEXT "$ELEMENT" \
 	--stringparam PREDICATE "$PREDICATE" \
