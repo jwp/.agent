@@ -41,13 +41,14 @@ its profile directory and querying the `History` file's schema.
 [ HTML ]
 
 In summary, `tidy | xsltproc print-anchors.xsl`. However, it takes some configuration to convince
-tidy to just clean it up.
+tidy to just clean it up. `hxnormalize` from html-xml-utils can work as well.
 
 /tidy/
 	&<https://www.html-tidy.org/>
-
 /xsltproc/
 	&<http://www.xmlsoft.org/libxslt/>
+/html-xml-utils/
+	&<http://www.w3.org/Tools/HTML-XML-utils/README>
 
 [ demojification ]
 
