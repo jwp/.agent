@@ -312,6 +312,15 @@ def rewriting(rwt:Iterable[tuple[str,str]]):
 def ignoring(values, records):
 	return (x for x in records if x[0] not in values)
 
+def scanning(v, records):
+	# Filter records where substring (v) is found in the link, title, or icon.
+	for r in records:
+		if v in r[0] or v in r[-1] or v in r[2]:
+			continue
+		else:
+			# No matching substrings.
+			yield r
+
 def interpret_filters(files):
 	"""
 	# Load the filter files and emit the constructed filters.
@@ -319,6 +328,7 @@ def interpret_filters(files):
 	ctx = {'rewrite-target': ''}
 	exact = []
 	prefix = []
+	substring = []
 
 	# Append the prefix match with the current value of `ctx['rewrite-target']`.
 	# Where the `>` instruction updates the field.
@@ -328,6 +338,7 @@ def interpret_filters(files):
 		'=': exact.append,
 		'^': prefix_rw,
 		'>': (lambda x: ctx.__setitem__('rewrite-target', x)),
+		'*': substring.append,
 	}
 	# Ignore most spaces and comments.
 	cases.update((x, (lambda x: None)) for x in '\n\t #')
@@ -342,6 +353,8 @@ def interpret_filters(files):
 		yield functools.partial(ignoring, set(exact))
 	if prefix:
 		yield rewriting(prefix)
+	for s in substring:
+		yield functools.partial(scanning, s)
 
 restricted = {
 	'-E': ('field-replace', True, 'title-strip-emoji'),
