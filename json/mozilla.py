@@ -177,7 +177,7 @@ def transform(ld):
 		titlesrc = ''
 	title = ' '.join(titlesrc.strip().split())
 
-	icon = d.get('icon') or d.get('image') or ''
+	icon = d.get('icon') or d.get('image') or d.get('iconUri') or ''
 
 	for f in time_fields:
 		if f in d:
