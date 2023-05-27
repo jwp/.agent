@@ -22,8 +22,7 @@ def sequence(record, *, FS='\t', RS='\n'):
 		link, FS,
 		t + pad, FS,
 		icon, FS,
-		title, FS,
-		RS,
+		title, RS,
 	])
 
 def structure(line, *, fields=4, FS='\t', RS='\n', tuple=tuple):
