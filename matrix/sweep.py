@@ -150,22 +150,20 @@ def restamp(ts:str, *, current=utc().truncate('minute'), limits=time_limits):
 	if not ts:
 		return current
 
-	if ts.isdigit():
-		t = Timestamp.of(unix=int(ts))
-	else:
-		t = Timestamp.of(iso=ts)
+	if not ts.isdigit():
+		return Timestamp.of(iso=ts)
 
 	# Reduce precision and handle precision failures.
-	tc = t
+	i = int(ts)
+	tc = Timestamp.of(unix=i)
 
 	# Presume unrecognized or unknown precision when outside of &limits.
-	if tc < limits[0]:
-		tc = tc.__class__(tc * 1000)
-		while tc < limits[0]:
-			tc = tc.__class__(tc * 1000)
-	else:
-		while tc > limits[1]:
-			tc = tc.__class__(tc // 1000)
+	while tc > limits[1]:
+		i = i // 1000
+		tc = Timestamp.of(unix=i)
+	while tc < limits[0]:
+		i = i * 1000
+		tc = Timestamp.of(unix=i)
 
 	return tc
 del time_limits
