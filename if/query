@@ -3,4 +3,4 @@
 #
 # [ Effects ]
 # Writes profile or executable locations to standard output.
-xalexec xal.agent.query "$@"
+xalexec xal.query "$@"

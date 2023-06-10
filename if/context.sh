@@ -45,8 +45,8 @@ xalcmd ()
 	case "$COMMAND"
 	in
 		# Aliases
-		aqx) xalifx agentq executables;;
-		aqp) xalifx agentq profiles;;
+		aqx) xalifx query executables;;
+		aqp) xalifx query profiles;;
 		help|'') (
 			cd "$XAL_CONTEXT/if" || return
 			echo "Commands:"
@@ -54,7 +54,7 @@ xalcmd ()
 			echo "Link aggregation:"
 			echo "${FS}\$ xal process ./path/to/directory-of-links [filter-files ...] >./links.tsv"
 			echo "Visitation aggregation:"
-			echo "${FS}\$ xal agentq visitation | xal track ./links.tsv >./visits.tsv"
+			echo "${FS}\$ xal query visitation | xal track ./links.tsv >./visits.tsv"
 		) >&2;;
 		*) xalifx "$COMMAND" "$@";;
 	esac

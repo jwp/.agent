@@ -2,7 +2,7 @@
 # Query for user agent executables and profile data directories.
 """
 from collections.abc import Iterable
-from . import locations
+from .installations import locations
 
 from fault.vector import recognition
 from fault.system import process
@@ -69,7 +69,7 @@ def main(inv:process.Invocation) -> process.Exit:
 			inv.exit(1)
 
 		for agent, data in filter(agentf, i):
-			am = import_module(modules[agent], package=__package__)
+			am = import_module(modules[agent], package=__package__+'.installations')
 			for ac, p, n in getattr(am, method)(agent, data):
 				if n is None:
 					continue
