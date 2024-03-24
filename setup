@@ -2,11 +2,12 @@
 # - Install Python dependencies to `xal/.pypi`, lz4 and pygtrie.
 # - Bind if/context.sh to an executable script for performing project operations(if/*).
 # - Display basic usage and installation.
+PYTHON="${PYTHON-:python3}"
 cd "$(dirname "$0")" || exit
 export XAL_CONTEXT="$(pwd)"
 . ./if/context.sh || exit # test -x xal/setup.
 
-if python3 -m pip install --upgrade -t "$XAL_CONTEXT/.pypi" lz4 pygtrie
+if "$PYTHON" -m pip install --upgrade -t "$XAL_CONTEXT/.pypi" lz4 pygtrie
 then
 	# Check installation.
 
