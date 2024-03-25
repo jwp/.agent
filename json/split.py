@@ -18,6 +18,7 @@ def fs(target, data):
 	# /data/
 		# The sequence to distribute.
 	"""
+
 	for i, idata in enumerate(data):
 		ipath = os.path.join(target, str(i+1) + '.json')
 		with open(ipath, 'w') as f:

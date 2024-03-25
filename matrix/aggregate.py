@@ -11,6 +11,7 @@ def sequence(record, *, FS='\t', RS='\n'):
 	"""
 	# Construct a sequenced record for serialization.
 	"""
+
 	link, time, icon, title = record
 
 	# Pad the timestamp for consistency.
@@ -29,6 +30,7 @@ def structure(line, *, fields=4, FS='\t', RS='\n', tuple=tuple):
 	"""
 	# Construct a tuple of four fields from the given line.
 	"""
+
 	assert line[-1] == RS
 	return tuple(line[:-1].split(FS, fields-1))
 
@@ -37,6 +39,7 @@ def merge(link, former, latter):
 	# Merge the fields of identical links recognizing earlier time contexts
 	# and non-empty fields as preferable.
 	"""
+
 	l, t, i, T = former
 	nd = 0
 
@@ -88,6 +91,7 @@ def uhash(link):
 	"""
 	# Construct a time delta from the hash of the link.
 	"""
+
 	h = hashlib.sha512(usedforsecurity=False)
 	assert h.digest_size == 64
 

@@ -29,6 +29,7 @@ def profiles(directory, *, Index=profiles_index):
 	"""
 	# Identify the available agent profile data.
 	"""
+
 	for agent, paths in Index.items():
 		for p in paths:
 			try:

@@ -49,6 +49,7 @@ def decompress(reader: Iterable[bytes], *, header=b'mozLz40\x00') -> Iterable[by
 
 	# Defers import of (pypi.org/package)&<lz4> until usage.
 	"""
+
 	from lz4.block import decompress as lz4_dc
 	return (lz4_dc(bytearray().join(reader)),)
 
@@ -56,6 +57,7 @@ def link_escapes(link, tab=('\t', '%'+hex(ord('\t'))[2:].rjust(2, '0'))):
 	"""
 	# Force percent escaped tabs.
 	"""
+
 	return link.replace(*tab)
 
 def link_normalize(link):
@@ -84,6 +86,7 @@ def structure(src:Iterable[bytes]):
 	"""
 	# Load the json data; transparently handles LZ4 compressed json.
 	"""
+
 	i = iter(src)
 
 	first = b''
@@ -107,6 +110,7 @@ def exclude(windows, closedtabs=['_closedTabs']):
 	"""
 	# Filter closed tabs in the window records.
 	"""
+
 	count = 0
 
 	for w in windows:
@@ -121,6 +125,7 @@ def find(struct):
 	"""
 	# Find all the links in the given data.
 	"""
+
 	containers = collections.deque((struct,))
 
 	while containers:
@@ -166,6 +171,7 @@ def transform(ld):
 	"""
 	# Convert the link and (json) object pair into a tuple for sequencing.
 	"""
+
 	l, d = ld
 
 	# Normalize spaces; important for serialization.
@@ -207,6 +213,7 @@ def session_fields(data):
 	"""
 	# Whether &data appears to be a session.
 	"""
+
 	if 'windows' not in data:
 		return False
 	w = data['windows'][0]
@@ -224,6 +231,7 @@ def bookmarks_fields(data):
 	"""
 	# Whether &data appears to be a bookmark export.
 	"""
+
 	if data.get('root', '') != 'placesRoot':
 		return False
 	if not isinstance(data.get('children'), list):
@@ -235,6 +243,7 @@ def entry_fields(data):
 	"""
 	# Whether &data appears to have resource indicator data.
 	"""
+
 	if 'url' not in data and 'uri' not in data:
 		return False
 	if 'title' not in data:
@@ -245,5 +254,4 @@ def entry_fields(data):
 if __name__ == '__main__':
 	import sys
 	records = find(structure(sys.stdin.buffer.readlines()))
-	xcount = exclude(records.get('windows', ()))
 	sys.stdout.writelines(sequence(map(transform, records)))

@@ -16,6 +16,7 @@ def main(inv:process.Invocation) -> process.Exit:
 	"""
 	# Execute corresponding processors sequentially.
 	"""
+
 	links, = inv.argv
 	lf = (process.fs_pwd() @ links)
 	vd = (files.root@__file__) ** 1

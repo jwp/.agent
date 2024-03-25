@@ -11,6 +11,7 @@ class Resource(object):
 	"""
 	# Fields available for selecting processing methods.
 	"""
+
 	r_selector: files.Path
 	r_type: str
 	r_encoding: str
@@ -32,6 +33,7 @@ def reflectcase(r:Resource, *, fields=4):
 	"""
 	# cat; presumed tsv.
 	"""
+
 	import subprocess
 	with r.r_selector.fs_open('rb') as f:
 		p = subprocess.run(['/bin/cat'], stdin=f, check=True)
@@ -40,6 +42,7 @@ def jsoncase(r:Resource):
 	"""
 	# json.mozilla or json.github-stars
 	"""
+
 	from ..json import mozilla as m
 	from ..json import github as gh
 	excluded_count = 0
@@ -69,6 +72,7 @@ def htmlcase(r:Resource):
 	"""
 	# tidy | xsltproc anchors.xsl
 	"""
+
 	from .. import html
 	import subprocess
 
@@ -134,6 +138,7 @@ def main(inv:process.Invocation) -> process.Exit:
 	"""
 	# Execute corresponding processors sequentially.
 	"""
+
 	for line in sys.stdin.readlines():
 		mimetype, encoding, rpath = line.split('\t', 3)
 		fp = (process.fs_pwd() @ rpath.removesuffix('\n'))

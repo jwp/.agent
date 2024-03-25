@@ -107,6 +107,7 @@ def relink(link):
 	# Normalize the link in order to maximize reductions.
 	# Trigger filtering with empty string returns.
 	"""
+
 	l = link.strip()
 
 	# Get scheme for mapping to a normal form.
@@ -147,6 +148,7 @@ def restamp(ts:str, *, current=utc().truncate('minute'), limits=time_limits):
 	# [ Returns ]
 	# The interpreted &Timestamp instance truncated to the minute.
 	"""
+
 	if not ts:
 		return current
 
@@ -172,6 +174,7 @@ def retitle(title:str):
 	"""
 	# Normalize the whitespace in &title.
 	"""
+
 	return ' '.join(
 		x for x in title.strip().split()
 		if x not in {
@@ -184,6 +187,7 @@ def sequence(record, *, FS='\t', RS='\n'):
 	"""
 	# Construct a sequenced record for serialization.
 	"""
+
 	link, time, icon, title = record
 
 	# Pad the timestamp for consistency.
@@ -203,6 +207,7 @@ def structure(line, *, fields=4, FS='\t', RS='\n', tuple=tuple):
 	"""
 	# Construct a tuple of four fields from the given line.
 	"""
+
 	assert line[-1] == RS
 	return tuple(line[:-1].split(FS, fields-1))
 
@@ -210,6 +215,7 @@ def trailing(link):
 	"""
 	# Normalize host references to include trailing slash.
 	"""
+
 	if link.endswith('/') or link.startswith('/'):
 		# Fast path.
 		return link
@@ -269,6 +275,7 @@ def rewrite(find, records):
 	"""
 	# Adjust the prefixes on the given records.
 	"""
+
 	for record in records:
 		link = record[0]
 
@@ -289,6 +296,7 @@ def rewriting(rwt:Iterable[tuple[str,str]]):
 
 	# Rewrites to &None are discarded.
 	"""
+
 	from pygtrie import CharTrie
 
 	# Rewrite the empty prefix to an empty string. (no-op)
@@ -325,6 +333,7 @@ def interpret_filters(files):
 	"""
 	# Load the filter files and emit the constructed filters.
 	"""
+
 	ctx = {'rewrite-target': ''}
 	exact = []
 	prefix = []

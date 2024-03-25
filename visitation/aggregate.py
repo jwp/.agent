@@ -13,6 +13,7 @@ def merge(former, latter):
 	"""
 	# Combine two records regarding the same subject.
 	"""
+
 	return (
 		former[0],
 		former[1] + latter[1],
@@ -35,6 +36,7 @@ def reduce(records):
 	"""
 	# Process visit records.
 	"""
+
 	init = last = ('', 0, utc(), utc())
 
 	for current in records:
@@ -54,6 +56,7 @@ def main(inv:process.Invocation) -> process.Exit:
 	"""
 	# Merge visitation metrics.
 	"""
+
 	inv.imports(['RS', 'FS'])
 	rs = inv.environ['RS']
 	fs = inv.environ['FS']
