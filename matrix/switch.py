@@ -48,7 +48,10 @@ def jsoncase(r:Resource):
 	excluded_count = 0
 
 	with r.r_selector.fs_open('rb') as f:
-		data = m.structure(f.readlines()) # json or ls4json.
+		data = m.structure(f.readlines()) # json or lz4json.
+		if isinstance(data, dict):
+			data.pop('_closedWindows', None)
+			data.pop('cookies', None)
 
 		if isinstance(data, list):
 			if data and gh.star_fields(data[0]):
@@ -103,7 +106,7 @@ def textcase(r:Resource, *, max_record_size=1024*200):
 					if len(sample) > max_record_size:
 						raise Unrecognized(r)
 					elif len(d) < 1024:
-						raise Unrecognized(r)
+						sample += b'\n'
 				else:
 					# Found a newline
 					tc = sample.count(b'\t')

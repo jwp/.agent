@@ -106,7 +106,7 @@ def structure(src:Iterable[bytes]):
 
 	return json.loads(b''.join(ijson))
 
-def exclude(windows, closedtabs=['_closedTabs']):
+def exclude(windows, filters=['_closedTabs']):
 	"""
 	# Filter closed tabs in the window records.
 	"""
@@ -114,12 +114,34 @@ def exclude(windows, closedtabs=['_closedTabs']):
 	count = 0
 
 	for w in windows:
-		for n in closedtabs:
+		for n in filters:
 			tabrecords = w.pop(n, ())
 			for r in tabrecords:
 				se = r.get('state', {'entries': []})
 				count += len(se)
 	return count
+
+def internal(link, record):
+	try:
+		if isinstance(record['closedAt'], int):
+			return True
+	except Exception:
+		pass
+
+	if not link.startswith('data:'):
+		return False
+
+	for tk in title_fields:
+		if tk in record:
+			titlesrc = record[tk]
+			break
+	else:
+		return False
+
+	if titlesrc.lower().strip() == '*shell*':
+		return True
+
+	return False
 
 def find(struct):
 	"""
@@ -161,8 +183,8 @@ def find(struct):
 
 		# Minimal scrubbing here.
 		link = link_escapes(link_normalize(link))
-		if not link:
-			# Filtering mozilla specific RIs: place:, about:, moz-extension:.
+		if not link or internal(link, d):
+			# Filtering mozilla specific RIs: place:, about:, moz-extension: and *shell*.
 			continue
 
 		yield link, d
